@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOLO - Твій всесвіт</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; color: white; font-family: sans-serif; }
+        .tab-active { border-bottom: 2px solid #10b981; color: #10b981; }
+        .bazar-btn { background: linear-gradient(90deg, #ef4444, #10b981); }
+    </style>
+</head>
+<body class="flex flex-col h-screen max-w-md mx-auto border-x border-gray-800">
+
+    <header class="p-4 flex justify-between items-center border-b border-gray-800 bg-black sticky top-0 z-10">
+        <h1 class="text-2xl font-bold tracking-tighter text-green-500">KOLO</h1>
+        <div class="flex gap-4">
+            <span class="text-xl">🔍</span>
+            <span class="text-xl text-red-500">🤖</span> </div>
+    </header>
+
+    <nav class="flex justify-around bg-black text-sm font-bold border-b border-gray-800">
+        <button class="py-3 px-2 tab-active text-xs">ВІДЕО</button>
+        <button class="py-3 px-2 text-gray-500 text-xs">ПОСТИ</button>
+        <button class="py-3 px-2 text-gray-500 text-xs">МУЗИКА</button>
+        <button class="py-3 px-2 text-gray-500 text-xs">ГРУПИ</button>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-2 space-y-4">
+        <div class="relative rounded-2xl overflow-hidden aspect-[9/16] bg-gray-900 border border-gray-800">
+            <div class="absolute bottom-4 left-4">
+                <p class="font-bold">@alex_dev</p>
+                <p class="text-sm text-gray-300">Створюю нову соцмережу KOLO! 🔥</p>
+                <p class="text-xs mt-1 text-green-400">♫ Оригінальний звук - KOLO Music</p>
+            </div>
+            <div class="absolute right-4 bottom-20 flex flex-col gap-4 items-center">
+                <div class="flex flex-col items-center"><span>❤️</span><span class="text-xs">54K</span></div>
+                <div class="flex flex-col items-center"><span>💬</span><span class="text-xs">1.2K</span></div>
+                <div class="flex flex-col items-center"><span>🔄</span><span class="text-xs">800</span></div>
+            </div>
+        </div>
+    </nav>
+
+    <footer class="p-4 border-t border-gray-800 bg-black flex justify-around items-center sticky bottom-0">
+        <span class="text-2xl">🏠</span>
+        <span class="text-2xl">🔥</span>
+        <button class="bazar-btn w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-green-900/20">🛒</button>
+        <span class="text-2xl">💬</span>
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-green-500 to-red-500 border border-white"></div>
+    </footer>
+
+</body>
+</html>
