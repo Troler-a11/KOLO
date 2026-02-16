@@ -3,122 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOLO App</title>
+    <title>KOLO - Core 1.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
-        .kolo-gradient { background: linear-gradient(90deg, #10b981, #000, #ef4444); }
+        .kolo-border { border-color: #1a1a1a; }
+        .accent-green { color: #10b981; }
+        .accent-red { color: #ef4444; }
         .hidden { display: none; }
         ::-webkit-scrollbar { width: 0; }
+        .video-overlay { background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
     </style>
 </head>
-<body class="flex flex-col h-screen max-w-md mx-auto border-x border-gray-900">
+<body class="flex flex-col h-screen max-w-md mx-auto border-x kolo-border">
 
-    <div id="auth-screen" class="flex-1 flex flex-col justify-center p-8 bg-black">
-        <h1 class="text-5xl font-black text-green-500 mb-2">KOLO</h1>
-        <p class="text-gray-400 mb-8">Введи номер для отримання коду 5+1</p>
-        <input id="phone" type="tel" placeholder="+380..." class="bg-gray-900 p-4 rounded-xl mb-4 border border-gray-800 outline-none focus:border-green-500">
-        <button onclick="sendCode()" class="bg-green-600 p-4 rounded-xl font-bold active:scale-95 transition">Отримати код</button>
+    <div id="auth-screen" class="flex-1 flex flex-col justify-center p-8">
+        <h1 class="text-6xl font-black accent-green tracking-tighter mb-4">KOLO</h1>
+        <div id="login-form">
+            <input id="phone" type="tel" placeholder="Номер телефону" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 outline-none focus:ring-1 ring-green-500">
+            <input id="pass" type="password" placeholder="Пароль (8+ символів)" class="w-full bg-zinc-900 p-4 rounded-2xl mb-6 outline-none focus:ring-1 ring-green-500">
+            <button onclick="sendCode()" class="w-full bg-green-600 p-4 rounded-2xl font-bold active:scale-95 transition">Створити акаунт</button>
+        </div>
         
-        <div id="code-section" class="hidden mt-6">
-            <p id="generated-code" class="text-center text-red-500 font-mono text-2xl mb-4 tracking-widest"></p>
-            <input id="v-code" type="text" placeholder="Введіть код сюди" class="w-full bg-gray-900 p-4 rounded-xl mb-4 border border-red-800 outline-none">
-            <button onclick="verify()" class="w-full bg-red-600 p-4 rounded-xl font-bold">Увійти в KOLO</button>
+        <div id="code-section" class="hidden mt-8 text-center">
+            <p class="text-zinc-500 mb-2">Код підтвердження:</p>
+            <p id="generated-code" class="text-3xl font-mono font-bold accent-red tracking-widest mb-6"></p>
+            <input id="v-code" type="text" placeholder="5 цифр + 1 буква" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 text-center uppercase outline-none border border-red-900">
+            <button onclick="verify()" class="w-full bg-red-600 p-4 rounded-2xl font-bold">Підтвердити</button>
         </div>
     </div>
 
     <div id="app-screen" class="hidden flex flex-col h-full">
-        <header class="p-4 flex justify-between items-center border-b border-gray-900">
-            <span class="text-2xl font-bold text-green-500">KOLO</span>
-            <div class="flex gap-4">
-                <button onclick="showPage('bazar')" class="text-red-500 font-bold">BAZAR</button>
-                <button onclick="showPage('chat')">💬</button>
-            </div>
-        </header>
+        <div class="flex justify-around p-4 border-b kolo-border font-bold text-xs tracking-widest">
+            <button onclick="setTab('video')" id="t-video" class="accent-green">ВІДЕО</button>
+            <button onclick="setTab('posts')" id="t-posts" class="text-zinc-500">ПОСТИ</button>
+            <button onclick="setTab('music')" id="t-music" class="text-zinc-500">МУЗИКА</button>
+            <button onclick="setTab('groups')" id="t-groups" class="text-zinc-500">ГРУПИ</button>
+        </div>
 
-        <main id="content" class="flex-1 overflow-y-auto p-4 pb-20">
-            <div id="page-feed" class="space-y-6">
-                <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800">
-                    <textarea id="post-text" placeholder="Що нового?" class="bg-transparent w-full outline-none mb-2"></textarea>
-                    <button onclick="addPost()" class="bg-green-500 px-4 py-1 rounded-full text-sm font-bold">Постити</button>
+        <main id="main-content" class="flex-1 overflow-y-auto relative">
+            <div id="sec-video" class="h-full bg-zinc-900 flex items-end p-6 video-overlay">
+                <div>
+                    <p class="font-bold text-lg">@kolo_founder</p>
+                    <p class="text-sm opacity-80">Перший запуск KOLO! Тестуємо мікросервіси на Go 🚀</p>
+                    <p class="text-xs mt-2 accent-green">♫ KOLO Original Sound - Music Service</p>
                 </div>
-                <div id="feed-items" class="space-y-6"></div>
-            </div>
-
-            <div id="page-bazar" class="hidden space-y-4">
-                <h2 class="text-xl font-bold text-red-500">Bazar Market</h2>
-                <div class="bg-gray-900 p-4 rounded-2xl">
-                    <input id="item-name" placeholder="Назва товару" class="bg-transparent block w-full mb-2 border-b border-gray-800">
-                    <input id="item-price" placeholder="Ціна" class="bg-transparent block w-full mb-4 border-b border-gray-800">
-                    <button onclick="addBazarItem()" class="w-full bg-red-600 py-2 rounded-xl font-bold">Виставити на базар</button>
-                </div>
-                <div id="bazar-items" class="grid grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="page-chat" class="hidden flex flex-col h-full">
-                <div id="chat-messages" class="flex-1 space-y-2 mb-4"></div>
-                <div class="flex gap-2">
-                    <input id="chat-input" class="flex-1 bg-gray-900 p-3 rounded-xl outline-none" placeholder="Повідомлення...">
-                    <button onclick="sendMessage()" class="bg-green-500 p-3 rounded-xl">➡</button>
+            <div id="sec-gemini" class="hidden h-full p-6 flex flex-col">
+                <h2 class="text-2xl font-bold accent-red mb-4 flex items-center gap-2">🤖 Gemini AI</h2>
+                <div class="flex-1 bg-zinc-900 rounded-3xl p-4 text-sm text-zinc-400">
+                    Привіт! Я твій ШІ-помічник. Можу допомогти змодерувати групу або підібрати трек. Що робимо?
                 </div>
+                <input type="text" placeholder="Запитай щось у Gemini..." class="mt-4 bg-zinc-800 p-4 rounded-2xl outline-none">
             </div>
         </main>
 
-        <nav class="fixed bottom-0 max-w-md w-full bg-black border-t border-gray-900 flex justify-around p-4">
-            <button onclick="showPage('feed')" class="text-2xl">📱</button>
-            <button class="text-2xl opacity-50">🎵</button>
-            <button onclick="showPage('bazar')" class="text-2xl">🛒</button>
-            <button onclick="location.reload()" class="text-2xl">👤</button>
+        <nav class="p-4 border-t kolo-border flex justify-around items-center bg-black">
+            <button onclick="setTab('video')" class="text-2xl">📱</button>
+            <button onclick="setTab('gemini')" class="text-2xl">🤖</button>
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 via-black to-red-500 p-[2px]">
+                <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-[10px]">KOLO</div>
+            </div>
+            <button class="text-2xl">💬</button>
+            <button class="text-2xl">👤</button>
         </nav>
     </div>
 
     <script>
-        // Логіка реєстрації
-        let tempCode = "";
+        let correctCode = "";
+
         function sendCode() {
-            if(!document.getElementById('phone').value) return alert('Введіть номер');
+            const phone = document.getElementById('phone').value;
+            const pass = document.getElementById('pass').value;
+            if (phone.length < 10 || pass.length < 8) return alert("Перевір номер та пароль (мін. 8 симв.)");
+            
             const digits = Math.floor(10000 + Math.random() * 90000);
-            const letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
-            tempCode = digits + letter;
-            document.getElementById('generated-code').innerText = "Твій код: " + tempCode;
+            const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+            correctCode = digits + letter;
+            
+            document.getElementById('login-form').classList.add('hidden');
             document.getElementById('code-section').classList.remove('hidden');
+            document.getElementById('generated-code').innerText = correctCode;
         }
 
         function verify() {
-            if(document.getElementById('v-code').value.toUpperCase() === tempCode) {
+            const input = document.getElementById('v-code').value.toUpperCase();
+            if (input === correctCode) {
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
-                loadData();
-            } else { alert('Невірний код!'); }
+            } else { alert("Код невірний!"); }
         }
 
-        // Навігація
-        function showPage(page) {
-            ['page-feed', 'page-bazar', 'page-chat'].forEach(p => document.getElementById(p).classList.add('hidden'));
-            document.getElementById('page-' + page).classList.remove('hidden');
-        }
-
-        // Функціонал
-        function addPost() {
-            const text = document.getElementById('post-text').value;
-            if(!text) return;
-            const post = `<div class="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800"><div class="p-4"><p class="font-bold text-green-400">@user</p><p>${text}</p></div></div>`;
-            document.getElementById('feed-items').insertAdjacentHTML('afterbegin', post);
-            document.getElementById('post-text').value = "";
-        }
-
-        function addBazarItem() {
-            const name = document.getElementById('item-name').value;
-            const price = document.getElementById('item-price').value;
-            const item = `<div class="bg-gray-900 p-3 rounded-xl border border-red-900/30 text-center"><div class="w-full aspect-square bg-gray-800 rounded-lg mb-2"></div><p class="font-bold">${name}</p><p class="text-red-500">${price} грн</p></div>`;
-            document.getElementById('bazar-items').insertAdjacentHTML('afterbegin', item);
-        }
-
-        function sendMessage() {
-            const msg = document.getElementById('chat-input').value;
-            if(!msg) return;
-            document.getElementById('chat-messages').innerHTML += `<div class="flex justify-end text-sm"><p class="bg-green-600 p-2 rounded-l-xl rounded-tr-xl">${msg}</p></div>`;
-            document.getElementById('chat-input').value = "";
+        function setTab(tab) {
+            const sections = ['video', 'gemini']; // Додай інші, коли напишеш контент
+            sections.forEach(s => {
+                const el = document.getElementById('sec-' + s);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById('sec-' + tab).classList.remove('hidden');
         }
     </script>
 </body>
