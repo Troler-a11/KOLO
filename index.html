@@ -3,132 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOLO Core 1.0</title>
+    <title>KOLO Core - Super App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
         .kolo-green { color: #10b981; }
-        .kolo-bg-green { background-color: #10b981; }
         .kolo-red { color: #ef4444; }
-        .kolo-bg-red { background-color: #ef4444; }
+        .bg-kolo-green { background-color: #10b981; }
+        .bg-kolo-red { background-color: #ef4444; }
         .border-kolo { border-color: #1a1a1a; }
         .hidden { display: none; }
-        .active-tab { border-bottom: 2px solid #10b981; color: #10b981; }
+        ::-webkit-scrollbar { width: 0; }
+        .profile-header { background: linear-gradient(to bottom, rgba(0,0,0,0), #000); }
     </style>
 </head>
 <body class="flex flex-col h-screen max-w-md mx-auto border-x border-kolo">
 
-    <div id="auth-screen" class="flex-1 flex flex-col justify-center p-8 bg-black z-50">
-        <h1 class="text-6xl font-black kolo-green tracking-tighter mb-2">KOLO</h1>
-        <p class="text-zinc-500 mb-8 text-sm uppercase tracking-widest font-bold">Core v1.0 Alpha</p>
+    <div id="auth-flow" class="flex-1 flex flex-col p-8 bg-black z-50 overflow-y-auto">
+        <h1 class="text-4xl font-black kolo-green mb-8">KOLO</h1>
         
-        <div id="reg-form">
-            <input id="reg-phone" type="tel" placeholder="Номер телефону" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 outline-none border border-kolo focus:border-green-500">
-            <input id="reg-pass" type="password" placeholder="Пароль (8+ символів)" class="w-full bg-zinc-900 p-4 rounded-2xl mb-6 outline-none border border-kolo focus:border-green-500">
-            <button onclick="handleReg()" class="w-full kolo-bg-green p-4 rounded-2xl font-bold active:scale-95 transition">Створити акаунт</button>
+        <div id="step-1" class="space-y-4">
+            <input id="reg-phone" type="tel" placeholder="Номер телефону" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-kolo focus:border-green-500">
+            <input id="reg-pass" type="password" placeholder="Пароль (8+ символів)" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-kolo focus:border-green-500">
+            <button onclick="toStep(2)" class="w-full bg-kolo-green p-4 rounded-2xl font-bold">Далі</button>
         </div>
 
-        <div id="code-section" class="hidden text-center">
-            <p class="text-zinc-400 mb-2">Ваш код підтвердження (5+1):</p>
-            <p id="display-code" class="text-3xl font-mono font-bold kolo-red tracking-widest mb-6"></p>
-            <input id="input-code" type="text" placeholder="Введіть код" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 text-center uppercase outline-none border border-red-900">
-            <button onclick="verifyCode()" class="w-full kolo-bg-red p-4 rounded-2xl font-bold">Увійти</button>
+        <div id="step-2" class="hidden text-center">
+            <p class="text-zinc-500 mb-2">Твій код підтвердження:</p>
+            <p id="display-code" class="text-3xl font-mono font-bold kolo-red mb-6 tracking-widest"></p>
+            <input id="input-code" type="text" placeholder="5 цифр + 1 буква" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 text-center uppercase outline-none border border-red-900">
+            <button onclick="toStep(3)" class="w-full bg-kolo-red p-4 rounded-2xl font-bold">Підтвердити</button>
+        </div>
+
+        <div id="step-3" class="hidden space-y-4 text-center">
+            <p class="text-sm text-zinc-400">Налаштуй свій профіль</p>
+            <div class="flex flex-col items-center gap-4">
+                <label class="w-24 h-24 bg-zinc-800 rounded-full border-2 border-dashed border-zinc-600 flex items-center justify-center cursor-pointer overflow-hidden">
+                    <span id="avatar-label">Ава</span>
+                    <input type="file" id="upload-ava" class="hidden" onchange="previewImg(this, 'avatar-preview')">
+                    <img id="avatar-preview" class="hidden w-full h-full object-cover">
+                </label>
+                <input id="reg-user" type="text" placeholder="@username (одноразово)" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-kolo">
+            </div>
+            <button onclick="finishReg()" class="w-full bg-kolo-green p-4 rounded-2xl font-bold">Почати</button>
         </div>
     </div>
 
     <div id="app-screen" class="hidden flex flex-col h-full">
-        <header class="flex justify-around p-4 border-b border-kolo text-[10px] font-black tracking-[0.2em]">
-            <button onclick="switchTab('video')" id="tab-video" class="active-tab">ВІДЕО</button>
-            <button onclick="switchTab('posts')" id="tab-posts" class="text-zinc-500">ПОСТИ</button>
-            <button onclick="switchTab('music')" id="tab-music" class="text-zinc-500">МУЗИКА</button>
-            <button onclick="switchTab('groups')" id="tab-groups" class="text-zinc-500">ГРУПИ</button>
+        <header class="p-4 flex justify-between items-center border-b border-kolo">
+            <span class="font-black kolo-green">KOLO</span>
+            <button onclick="showPage('contacts')" class="text-xl">👥</button>
         </header>
 
-        <main class="flex-1 overflow-y-auto relative">
-            <div id="sec-video" class="h-full bg-zinc-900 flex flex-col justify-end p-6 bg-gradient-to-t from-black to-transparent">
-                <p class="font-bold">@ceo_kolo</p>
-                <p class="text-sm opacity-70">Наш відео-хостинг на Go витримає будь-що!</p>
-                <div class="flex gap-4 mt-4">
-                    <span>❤️ 12k</span> <span>💬 400</span> <span>🔄 150</span>
+        <main id="main-scroll" class="flex-1 overflow-y-auto">
+            <div id="page-feed" class="p-4">Стрічка відео та постів...</div>
+
+            <div id="page-contacts" class="hidden p-4 space-y-4">
+                <h2 class="font-bold text-zinc-500">Контакти</h2>
+                <div class="flex items-center gap-4 p-2">
+                    <div class="w-12 h-12 bg-zinc-800 rounded-full"></div>
+                    <div><p class="font-bold">Олександр</p><p class="text-xs text-zinc-500">був нещодавно</p></div>
                 </div>
             </div>
 
-            <div id="sec-posts" class="hidden p-4 space-y-6">
-                <div class="bg-zinc-900 p-4 rounded-3xl border border-kolo">
-                    <p class="kolo-green font-bold mb-2">@dev_team</p>
-                    <p class="mb-4">Ми інтегрували деревоподібні коментарі. Тепер можна відповідати нескінченно!</p>
-                    <div class="pl-4 border-l-2 border-zinc-800 space-y-2 text-sm">
-                        <p><span class="text-red-500">@user1:</span> Круто!</p>
-                        <div class="pl-4 border-l border-zinc-800"><p><span class="text-green-500">@admin:</span> Дякуємо!</p></div>
+            <div id="page-profile" class="hidden">
+                <div class="h-40 bg-zinc-800 relative">
+                    <img id="final-header" class="w-full h-full object-cover opacity-50">
+                    <div class="absolute -bottom-10 left-6 w-24 h-24 rounded-full border-4 border-black bg-zinc-900 overflow-hidden">
+                        <img id="final-ava" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="mt-12 p-6">
+                    <h2 id="final-name" class="text-2xl font-black">@username</h2>
+                    <div class="flex gap-6 mt-4 text-sm">
+                        <span><b>50k</b> фоловерів</span>
+                        <span><b>1.2M</b> лайків</span>
+                    </div>
+                    <div class="mt-8 grid grid-cols-3 gap-1">
+                        <div class="aspect-square bg-zinc-900"></div>
+                        <div class="aspect-square bg-zinc-900"></div>
+                        <div class="aspect-square bg-zinc-900"></div>
                     </div>
                 </div>
             </div>
-
-            <div id="sec-music" class="hidden p-6">
-                <h2 class="text-2xl font-bold mb-6">Твоя черга</h2>
-                <div class="flex items-center gap-4 bg-zinc-900 p-4 rounded-2xl mb-4">
-                    <div class="w-12 h-12 kolo-bg-green rounded-lg flex items-center justify-center">🎵</div>
-                    <div><p class="font-bold">KOLO Anthem</p><p class="text-xs text-zinc-500">Official Artist</p></div>
-                </div>
-            </div>
-
-            <div id="sec-gemini" class="hidden p-6 flex flex-col h-full">
-                <div class="flex-1 bg-zinc-900 rounded-3xl p-6 border border-kolo">
-                    <p class="kolo-red font-bold mb-4">Gemini AI Helper:</p>
-                    <p class="text-zinc-400">Я допоможу тобі з модерацією або вибором музики. База векторна (Pinecone) підключена.</p>
-                </div>
-                <input type="text" placeholder="Запит до ШІ..." class="mt-4 bg-zinc-800 p-4 rounded-2xl outline-none border border-kolo">
-            </div>
         </main>
 
-        <footer class="p-4 border-t border-kolo flex justify-around items-center bg-black">
-            <button onclick="switchTab('video')" class="text-xl">🏠</button>
-            <button onclick="switchTab('gemini')" class="text-xl">🤖</button>
-            <div class="w-12 h-12 rounded-full kolo-bg-green flex items-center justify-center font-black text-xs text-black shadow-[0_0_15px_rgba(16,185,129,0.3)]">K</div>
-            <button class="text-xl">💬</button>
-            <button class="text-xl">👤</button>
-        </footer>
+        <nav class="p-4 border-t border-kolo flex justify-around bg-black">
+            <button onclick="showPage('feed')">🏠</button>
+            <button onclick="showPage('contacts')">💬</button>
+            <button class="w-12 h-12 bg-kolo-green rounded-full flex items-center justify-center">🤖</button>
+            <button>🎵</button>
+            <button onclick="showPage('profile')">👤</button>
+        </nav>
     </div>
 
     <script>
         let code = "";
-
-        function handleReg() {
-            const ph = document.getElementById('reg-phone').value;
-            const ps = document.getElementById('reg-pass').value;
-            if(ph.length < 5 || ps.length < 8) return alert("Помилка: пароль має бути 8+ символів!");
-            
-            // Генератор 5+1
-            const digits = Math.floor(10000 + Math.random() * 90000);
-            const char = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-            code = digits + char;
-
-            document.getElementById('reg-form').classList.add('hidden');
-            document.getElementById('code-section').classList.remove('hidden');
-            document.getElementById('display-code').innerText = code;
+        function toStep(n) {
+            if(n === 2) {
+                const ph = document.getElementById('reg-phone').value;
+                const ps = document.getElementById('reg-pass').value;
+                if(ph.length < 5 || ps.length < 8) return alert("Пароль 8+ символів!");
+                code = Math.floor(10000 + Math.random() * 90000) + String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                document.getElementById('display-code').innerText = code;
+            }
+            document.querySelectorAll('#auth-flow > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById('step-' + n).classList.remove('hidden');
         }
 
-        function verifyCode() {
-            const input = document.getElementById('input-code').value.toUpperCase();
-            if(input === code) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-            } else { alert("Невірний код підтвердження!"); }
+        function previewImg(input, targetId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.getElementById(targetId);
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    if(targetId === 'avatar-preview') document.getElementById('avatar-label').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
-        function switchTab(target) {
-            const tabs = ['video', 'posts', 'music', 'groups', 'gemini'];
-            tabs.forEach(t => {
-                const sec = document.getElementById('sec-' + t);
-                const btn = document.getElementById('tab-' + t);
-                if(sec) sec.classList.add('hidden');
-                if(btn) { btn.classList.remove('active-tab'); btn.classList.add('text-zinc-500'); }
-            });
-            
-            document.getElementById('sec-' + target).classList.remove('hidden');
-            const activeBtn = document.getElementById('tab-' + target);
-            if(activeBtn) { activeBtn.classList.add('active-tab'); activeBtn.classList.remove('text-zinc-500'); }
+        function finishReg() {
+            const user = document.getElementById('reg-user').value;
+            if(!user) return alert("Введи юзернейм");
+            document.getElementById('auth-flow').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('final-name').innerText = user;
+            document.getElementById('final-ava').src = document.getElementById('avatar-preview').src;
+        }
+
+        function showPage(p) {
+            ['page-feed', 'page-contacts', 'page-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('page-' + p).classList.remove('hidden');
         }
     </script>
 </body>
