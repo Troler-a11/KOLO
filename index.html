@@ -3,110 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KOLO Core</title>
+    <title>KOLO - Ultimate UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
         .kolo-green { color: #10b981; }
-        .bg-kolo-green { background-color: #10b981; }
+        .bg-kolo-green { background: #10b981; }
         .border-kolo { border-color: #1a1a1a; }
-        .hidden { display: none ! theoretic; }
-        
-        /* Головний контейнер на весь екран */
-        .app-container { height: 100vh; display: flex; flex-direction: column; }
-        .content-scroll { flex: 1; overflow-y: auto; padding-bottom: 80px; }
-        
-        /* Стиль активної вкладки */
-        .tab-btn.active { color: #10b981; border-bottom: 2px solid #10b981; }
+        .app-shell { height: 100vh; display: flex; flex-direction: column; }
+        .main-scroll { flex: 1; overflow-y: auto; padding-bottom: 90px; }
+        .ai-sphere { width: 50px; height: 50px; background: radial-gradient(circle, #ef4444 20%, #000 70%, #10b981 100%); border: 2px solid #1a1a1a; }
+        .nav-tab { font-size: 10px; font-weight: bold; padding: 10px 5px; border-radius: 20px; border: 1px solid #333; }
     </style>
 </head>
-<body>
+<body class="max-w-md mx-auto border-x border-kolo">
 
-    <div class="app-container max-w-md mx-auto border-x border-kolo">
-        
-        <header class="p-4 flex justify-between items-center border-b border-kolo bg-black z-10">
-            <span class="text-xl font-black kolo-green">KOLO</span>
-            <div class="flex gap-4">
-                <button onclick="showPage('gemini')" class="text-xl">🤖</button>
-                <button onclick="showPage('contacts')" class="text-xl">👥</button>
+    <div class="app-shell">
+        <header>
+            <div class="h-24 bg-zinc-800 w-full relative overflow-hidden">
+                <img src="https://picsum.photos/seed/kolo/800/200" class="w-full h-full object-cover opacity-60" alt="Banner">
+                <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                <button class="absolute right-4 top-4 text-xl">🔍</button>
+            </div>
+            
+            <div class="flex items-center gap-3 p-4 -mt-8 relative z-10">
+                <div class="w-16 h-16 rounded-full border-4 border-black overflow-hidden bg-zinc-900">
+                    <img src="https://i.pravatar.cc/150?u=me" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1 mt-6">
+                    <div class="flex gap-2 items-center">
+                        <button class="bg-zinc-900 px-3 py-1 rounded-full text-xs font-bold border border-zinc-700 flex items-center gap-1">
+                            👥 Друзі
+                        </button>
+                        <div class="h-1 w-1 bg-green-500 rounded-full"></div>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <nav class="flex justify-around bg-black border-b border-kolo text-[10px] font-bold tracking-widest">
-            <button onclick="switchTab('video')" class="tab-btn py-3 px-2 active" id="btn-video">ВІДЕО</button>
-            <button onclick="switchTab('posts')" class="tab-btn py-3 px-2 text-zinc-500" id="btn-posts">ПОСТИ</button>
-            <button onclick="switchTab('music')" class="tab-btn py-3 px-2 text-zinc-500" id="btn-music">МУЗИКА</button>
-            <button onclick="switchTab('groups')" class="tab-btn py-3 px-2 text-zinc-500" id="btn-groups">ГРУПИ</button>
+        <nav class="flex gap-2 p-2 overflow-x-auto no-scrollbar border-b border-kolo">
+            <button class="nav-tab text-green-500 border-green-500 min-w-[80px]">GROUPS</button>
+            <button class="nav-tab text-zinc-400 min-w-[110px]">SUBSCRIPTIONS</button>
+            <button class="nav-tab text-red-500 min-w-[80px]">MUSIC</button>
+            <button class="nav-tab text-zinc-400 min-w-[80px]">VIDEO</button>
+            <button class="nav-tab text-zinc-400 min-w-[80px]">POSTS</button>
         </nav>
 
-        <main class="content-scroll" id="main-content">
-            
-            <div id="page-video" class="h-[80vh] bg-zinc-900 flex items-end p-6 relative">
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                <div class="relative z-10">
-                    <p class="font-bold">@alex_founder</p>
-                    <p class="text-sm opacity-80">Тестуємо стрімінг HLS. Все літає! 🚀</p>
+        <main class="main-scroll p-4">
+            <div class="aspect-video bg-zinc-900 rounded-3xl mb-4 flex items-center justify-center border border-kolo">
+                <p class="text-zinc-500">Відео стрічка (HLS Player)</p>
+            </div>
+            <div class="space-y-4">
+                <div class="h-40 bg-zinc-900 rounded-3xl p-4 border border-kolo">
+                    <p class="text-sm">Останній пост або новина групи...</p>
                 </div>
             </div>
-
-            <div id="page-posts" class="hidden p-4 space-y-4">
-                <div class="bg-zinc-900 p-4 rounded-2xl border border-kolo">
-                    <p class="text-xs text-zinc-500 mb-2">@system • 1 хв тому</p>
-                    <p>Це приклад поста з деревоподібними коментарями.</p>
-                </div>
-            </div>
-
-            <div id="page-contacts" class="hidden p-4 space-y-4">
-                <h2 class="text-zinc-500 font-bold uppercase text-xs">Твої контакти</h2>
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-zinc-800 rounded-full border border-kolo"></div>
-                    <div><p class="font-bold">Олександр</p><p class="text-xs text-zinc-500">був нещодавно</p></div>
-                </div>
-            </div>
-
-            <div id="page-music" class="hidden p-4 space-y-4">
-                <h2 class="text-xl font-bold">Музика для тебе</h2>
-                <div class="bg-zinc-900 p-4 rounded-xl flex justify-between items-center">
-                    <div><p class="font-bold">Night Drive</p><p class="text-xs text-zinc-500">KOLO Records</p></div>
-                    <button class="text-green-500">▶</button>
-                </div>
-            </div>
-
         </main>
 
-        <footer class="fixed bottom-0 max-w-md w-full bg-black border-t border-kolo flex justify-around items-center p-4 z-20">
-            <button onclick="switchTab('video')" class="text-2xl">🏠</button>
-            <button onclick="showPage('contacts')" class="text-2xl">💬</button>
-            <div onclick="showPage('gemini')" class="w-12 h-12 bg-kolo-green rounded-full flex items-center justify-center shadow-lg shadow-green-900/20 cursor-pointer">
-                <span class="text-black font-black text-xs">AI</span>
-            </div>
-            <button onclick="switchTab('music')" class="text-2xl">🎵</button>
-            <button onclick="alert('Профіль з шапкою')" class="text-2xl">👤</button>
+        <footer class="fixed bottom-0 max-w-md w-full bg-black border-t border-kolo p-3 flex justify-around items-center h-20">
+            <button class="flex flex-col items-center">
+                <span class="text-2xl">💬</span>
+            </button>
+            
+            <button class="flex flex-col items-center">
+                <div class="ai-sphere rounded-full shadow-lg shadow-green-900/20"></div>
+            </button>
+            
+            <button class="flex flex-col items-center text-green-500">
+                <span class="text-3xl">🏠</span>
+            </button>
+            
+            <button class="flex flex-col items-center">
+                <span class="text-2xl text-green-400">📞</span>
+            </button>
+            
+            <button class="flex flex-col items-center">
+                <span class="text-2xl">⚙️</span>
+            </button>
+            
+            <button class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-xl border border-zinc-600">+</div>
+            </button>
         </footer>
-
     </div>
 
-    <script>
-        function switchTab(tab) {
-            // Приховуємо всі вкладки
-            const pages = ['page-video', 'page-posts', 'page-music', 'page-contacts'];
-            pages.forEach(p => document.getElementById(p).classList.add('hidden'));
-            
-            // Знімаємо активний клас з кнопок
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-white'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-zinc-500'));
-
-            // Показуємо потрібну
-            const target = document.getElementById('page-' + tab);
-            if(target) target.classList.remove('hidden');
-            
-            const btn = document.getElementById('btn-' + tab);
-            if(btn) { btn.classList.add('active', 'text-white'); }
-        }
-
-        function showPage(page) {
-            switchTab(page); // Використовуємо ту саму логіку для простоти
-        }
-    </script>
 </body>
 </html>
